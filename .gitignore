@@ -1,0 +1,23 @@
+# Ortam değişkenleri
+.env
+
+# Veritabanı dosyaları
+*.db
+
+# Python derleme artıkları
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Loglar
+logs/
+stderr.log
+*.log
+
+# IDE veya editör dosyaları
+.idea/
+.vscode/
+
+# Geçici klasörler
+tmp/
