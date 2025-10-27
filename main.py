@@ -86,11 +86,11 @@ def saat_to_dakika(saat_str):
         return 0
 # Başlangıç sayfası
 @app.route('/')
-@login_required()
+@login_required
 def home():
     return render_template('anasayfa.html')
 @app.route('/musteriler')
-@login_required()
+@login_required
 def musteriler():
     try:
         conn = get_db_connection()
@@ -104,7 +104,7 @@ def musteriler():
         flash(f"Veritabanı hatası: {e}", "error")
         return render_template('musteriler.html', musteriler=[])
 @app.route('/musteri/<int:id>')
-@login_required()
+@login_required
 def musteri_detay(id):
     try:
         conn = get_db_connection()
@@ -144,7 +144,7 @@ def musteri_detay(id):
         flash(f"Veritabanı hatası: {e}", "error")
         return redirect(url_for('musteriler'))
 @app.route('/musteri_ekle', methods=['GET', 'POST'])
-@login_required()()
+@login_required()
 def musteri_ekle():
     if request.method == 'POST':
         try:
@@ -190,7 +190,7 @@ def musteri_ekle():
     # GET isteği ise formu göster
     return render_template('musteri_ekle.html')
 @app.route('/musteri_sil/<int:id>', methods=['GET'])
-@login_required()()
+@login_required()
 def musteri_sil(id):
     try:
         conn = get_db_connection()
@@ -223,7 +223,7 @@ def musteri_sil(id):
             "message": f"Veritabanı hatası: {e}"
         })
 @app.route('/musteri_duzenle/<int:id>', methods=['GET', 'POST'])
-@login_required()()
+@login_required()
 def musteri_duzenle(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -271,7 +271,7 @@ def musteri_duzenle(id):
     conn.close()
     return render_template('musteri_duzenle.html', musteri=musteri)
 @app.route('/talepler')
-@login_required()()
+@login_required()
 def talepler():
     try:
         conn = get_db_connection()
@@ -302,7 +302,7 @@ def talepler():
         flash(f"Veritabanı hatası: {e}", "error")
         return render_template('talepler.html', talepler=[])
 @app.route('/talep_olustur', methods=['GET', 'POST'])
-@login_required()()
+@login_required()
 def talep_olustur():
     if request.method == 'POST':
         try:
@@ -352,7 +352,7 @@ def talep_olustur():
     manes_numara = get_manes_numara()
     return render_template('talep_olustur.html', manes_numara=manes_numara, musteriler=musteriler)
 @app.route('/talep/<int:id>')
-@login_required()()
+@login_required()
 def talep_detay(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -374,7 +374,7 @@ def talep_detay(id):
 
     return render_template('talep_detay.html', talep=talep)
 @app.route('/talep_duzenle/<int:id>', methods=['GET', 'POST'])
-@login_required()()
+@login_required()
 def talep_duzenle(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -426,7 +426,7 @@ def talep_duzenle(id):
     conn.close()
     return render_template('talep_duzenle.html', talep=talep, musteriler=musteriler)
 @app.route('/talep_sil/<int:id>', methods=['GET'])
-@login_required()()()
+@login_required()()
 def talep_sil(id):
     try:
         conn = get_db_connection()
@@ -458,7 +458,7 @@ def talep_sil(id):
             "message": f"Veritabanı hatası: {str(e)}"
         })
 @app.route('/teklif_olustur', methods=['GET'])
-@login_required()
+@login_required
 def teklif_olustur():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -499,7 +499,7 @@ def get_teklif_seri():
     next_number = max(numbers) + 1 if numbers else 1
     return f"{prefix}{str(next_number).zfill(4)}"
 @app.route('/teklifler')
-@login_required()
+@login_required
 def teklifler():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -525,7 +525,7 @@ def teklifler():
 
     return render_template('teklifler.html', teklifler=teklif_listesi)
 @app.route('/teklif/<int:id>')
-@login_required()
+@login_required
 def teklif_detay(id):
     try:
         conn = get_db_connection()
@@ -560,7 +560,7 @@ def teklif_detay(id):
         flash("Bir hata oluştu!", "error")
         return redirect(url_for('teklifler'))
 @app.route('/teklif_kaydet', methods=['POST'])
-@login_required()
+@login_required
 def teklif_kaydet():
     try:
         talep_id = request.form.get('talep_id')
@@ -645,7 +645,7 @@ def teklif_kaydet():
         print(f"❌ Hata oluştu: {str(e)}")
         return jsonify({"error": f"Hata oluştu: {str(e)}"}), 500
 @app.route('/teklif_duzenle/<int:id>', methods=['GET', 'POST'])
-@login_required()
+@login_required
 def teklif_duzenle(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -691,7 +691,7 @@ def teklif_duzenle(id):
         doviz=doviz
     )
 @app.route('/teklif_guncelle/<int:id>', methods=['POST'])
-@login_required()
+@login_required
 def teklif_guncelle(id):
     try:
         conn = get_db_connection()
@@ -748,7 +748,7 @@ def teklif_guncelle(id):
         return jsonify({"error": f"Hata oluştu: {str(e)}"}), 500
 
 @app.route('/teklif_durum_guncelle/<int:id>', methods=['POST'])
-@login_required()
+@login_required
 def teklif_durum_guncelle(id):
     yeni_durum = request.form.get('durum')
 
@@ -770,7 +770,7 @@ def teklif_durum_guncelle(id):
     return redirect(url_for('teklifler'))
 
 @app.route('/teklif_sil/<int:id>', methods=['GET'])
-@login_required()
+@login_required
 def teklif_sil(id):
     try:
         conn = get_db_connection()
@@ -799,7 +799,7 @@ def teklif_sil(id):
         return jsonify({"success": False, "message": f"Veritabanı hatası: {e}"})
         
 @app.route('/siparisler')
-@login_required()
+@login_required
 def siparisler():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -809,7 +809,7 @@ def siparisler():
     conn.close()
     return render_template('siparisler.html', siparisler=siparisler)
 @app.route('/raporlar')
-@login_required()
+@login_required
 def raporlar():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -820,7 +820,7 @@ def raporlar():
     return render_template('raporlar.html', raporlar=raporlar)
 
 @app.route('/siparis_olustur/<int:id>', methods=['GET', 'POST'])
-@login_required()
+@login_required
 def siparis_olustur(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -856,7 +856,7 @@ def siparis_olustur(id):
     return render_template('siparis_olustur.html', teklif=teklif)
 
 @app.route('/api/talepler', methods=['GET'])
-@login_required()
+@login_required
 def api_talepler():
     try:
         conn = get_db_connection()
@@ -870,7 +870,7 @@ def api_talepler():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/musteriler', methods=['GET'])
-@login_required()
+@login_required
 def api_musteriler():
     try:
         conn = get_db_connection()
@@ -884,7 +884,7 @@ def api_musteriler():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/teklif_pdf/<int:id>')
-@login_required()
+@login_required
 def teklif_pdf(id):
     try:
         conn = get_db_connection()
@@ -935,7 +935,7 @@ def generate_is_emri_no():
     return f"M{new_number:04d}"
 
 @app.route('/uretim_olustur', methods=['GET', 'POST'])
-@login_required()
+@login_required
 def uretim_olustur():
     
     if request.method == 'POST':
@@ -1040,7 +1040,7 @@ def uretim_olustur():
 
 
 @app.route('/uretim')
-@login_required()
+@login_required
 def uretim():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -1052,7 +1052,7 @@ def uretim():
 
 # İş emri detay sayfası: Uretim özet ve is_emirleri (detaylar) ile prosesleri getir.
 @app.route('/uretim/<int:id>')
-@login_required()
+@login_required
 def uretim_detay(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -1080,7 +1080,7 @@ def uretim_detay(id):
 # Üretim silme
 
 @app.route('/uretim_sil/<int:id>', methods=['GET'])
-@login_required()
+@login_required
 def uretim_sil(id):
     try:
         conn = get_db_connection()
@@ -1130,7 +1130,7 @@ def uretim_sil(id):
 
 # Üretim düzenleme sayfası
 @app.route('/uretim_duzenle/<int:id>', methods=['GET', 'POST'])
-@login_required()
+@login_required
 def uretim_duzenle(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -1239,7 +1239,7 @@ def uretim_duzenle(id):
 
 # Üretim PDF çıktısı
 @app.route('/uretim_pdf/<int:id>')
-@login_required()
+@login_required
 def uretim_pdf(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -1333,7 +1333,7 @@ def login():
 from werkzeug.security import generate_password_hash
 
 @app.route('/kullanici_ekle', methods=['GET', 'POST'])
-@login_required()  # Admin girişi yapmış biri kullanabilmeli
+@login_required  # Admin girişi yapmış biri kullanabilmeli
 def kullanici_ekle():
     if session.get('rol') != 'admin':
         flash("Bu işlemi sadece admin kullanıcılar yapabilir!", "error")
@@ -1375,7 +1375,7 @@ def kullanici_ekle():
 
 
 @app.route('/panel/taleplerim')
-@login_required()
+@login_required
 def musteri_taleplerim():
     if session.get('rol') != 'musteri':
         return redirect(url_for('home'))  # admin yanlışlıkla girerse yönlendir
@@ -1418,7 +1418,7 @@ def musteri_taleplerim():
 
     return render_template('panel_taleplerim.html', talepler=talepler)
 @app.route('/panel')
-@login_required()
+@login_required
 def panel_index():
     if session.get('rol') != 'musteri':
         return redirect(url_for('home'))
