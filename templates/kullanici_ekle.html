@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Ekle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="sidebar">
+        <h2><a href="{{ url_for('home') }}" style="text-decoration: none; color: white;">ERP Menüsü</a></h2>
+        <ul>
+            <li><a href="{{ url_for('musteriler') }}"><i class="fas fa-users"></i> Müşteri Yönetimi</a></li>
+            <li><a href="{{ url_for('talepler') }}"><i class="fas fa-tasks"></i> Talep Yönetimi</a></li>
+            <li><a href="{{ url_for('teklifler') }}"><i class="fas fa-file-invoice-dollar"></i> Teklif Yönetimi</a></li>
+            <li><a href="{{ url_for('uretim') }}"><i class="fas fa-industry"></i> Üretim Yönetimi</a></li>
+        </ul>
+        <div class="logout">
+            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <h2>Kullanıcı Ekle</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="form-style">
+            <div class="form-group">
+                <label for="username">Kullanıcı Adı (email):</label>
+                <input type="email" name="username" id="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Şifre:</label>
+                <input type="password" name="password" id="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="rol">Rol:</label>
+                <select name="rol" id="rol" required>
+                    <option value="admin">Admin</option>
+                    <option value="musteri">Müşteri</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-submit">✅ Kaydet</button>
+        </form>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 MANES Makine Mühendislik - Tüm hakları saklıdır.</p>
+    </div>
+</body>
+</html>

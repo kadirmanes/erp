@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talep Yönetimi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="sidebar">
+        <h2><a href="{{ url_for('home') }}" style="text-decoration: none; color: white;">ERP Menüsü</a></h2>
+        <ul>
+            <ul>
+                <li><a href="{{ url_for('musteriler') }}"><i class="fas fa-users"></i> Müşteri Yönetimi</a></li>
+                <li><a href="{{ url_for('talepler') }}"><i class="fas fa-tasks"></i> Talep Yönetimi</a></li>
+                <li><a href="{{ url_for('teklifler') }}"><i class="fas fa-file-invoice-dollar"></i> Teklif Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('siparisler') }}"><i class="fas fa-shopping-cart"></i> Sipariş Yönetimi</a></li>-->
+                <li><a href="{{ url_for('uretim') }}"><i class="fas fa-industry"></i> Üretim Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('raporlar') }}"><i class="fas fa-chart-line"></i> Raporlama</a></li>-->
+            </ul>
+        
+        </ul>
+    <div class="logout">
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+    </div>
+    
+    </div>
+
+    <div class="content">
+        <h2>Talep Yönetimi</h2>
+
+        <div class="search-filter">
+            <button onclick="filterResults()">
+                <i class="fa-solid fa-filter"></i> FİLTRELE
+            </button>
+            <div class="search-bar">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" placeholder="Ara..." id="searchInput">
+            </div>
+            <button class="new-customer" onclick="window.location.href='/talep_olustur'">YENİ TALEP OLUŞTUR</button>
+        </div>
+        
+
+        <div class="customer-table">
+            {% for talep in talepler %}
+                <a href="{{ url_for('talep_detay', id=talep.id) }}" class="customer-item">
+                    <span>{{ talep.manes_numara }} - {{ talep.firma_unvani }}</span>
+                </a>
+            {% endfor %}
+        </div>
+        
+    </div>
+    <div class="footer">
+            <p>&copy; 2024 MANES Makine Mühendislik - Tüm hakları saklıdır.</p>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', function () {
+            const filtre = searchInput.value.toLowerCase();
+            const satirlar = document.querySelectorAll('#talepListesi tr');
+
+            satirlar.forEach(satir => {
+                const text = satir.innerText.toLowerCase();
+                satir.style.display = text.includes(filtre) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

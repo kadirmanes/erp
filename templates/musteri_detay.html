@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ musteri.firma_unvani }} - Detay</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="content">
+        <h2>{{ musteri.firma_unvani }} - Müşteri Detayları</h2>
+
+        <div class="customer-info">
+            <p><strong>Vergi/TCKN:</strong> {{ musteri.vkn_tckn }}</p>
+            <p><strong>Email:</strong> {{ musteri.email }}</p>
+            <p><strong>Telefon:</strong> {{ musteri.telefon }}</p>
+            <p><strong>Adres:</strong> {{ musteri.adres }}</p>
+            <p><strong>Vergi Dairesi:</strong> {{ musteri.vergi_dairesi }}</p>
+        </div>
+
+        <h3>Talepler</h3>
+        <div class="customer-table">
+            {% for talep in talepler %}
+                <div class="customer-item">
+                    <span>Talep No: {{ talep.manes_numara }} - Tarih: {{ talep.tarih }}</span>
+                </div>
+            {% else %}
+                <p>Bu müşteriye ait talep bulunamadı.</p>
+            {% endfor %}
+        </div>
+
+        <h3>Teklifler</h3>
+        <div class="customer-table">
+            {% for teklif in teklifler %}
+                <div class="customer-item">
+                    <span>Teklif: {{ teklif.teklif_ismi }} - Genel Toplam: {{ teklif.genel_toplam }} {{ teklif.doviz }}</span>
+                </div>
+            {% else %}
+                <p>Bu müşteriye ait teklif bulunamadı.</p>
+            {% endfor %}
+        </div>
+
+        <h3>Siparişler</h3>
+        <div class="customer-table">
+            {% for siparis in siparisler %}
+                <div class="customer-item">
+                    <span>Sipariş: {{ siparis.siparis_ismi }} - Toplam: {{ siparis.toplam_tutar }}</span>
+                </div>
+            {% else %}
+                <p>Bu müşteriye ait sipariş bulunamadı.</p>
+            {% endfor %}
+        </div>
+
+        <a href="/musteriler" class="btn-cancel">Geri Dön</a>
+    </div>
+</body>
+</html>

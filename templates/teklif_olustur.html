@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teklif Oluştur</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+</head>
+<body>
+    <div class="sidebar">
+        <h2><a href="{{ url_for('home') }}" style="text-decoration: none; color: white;">ERP Menüsü</a></h2>
+        <ul>
+            <ul>
+                <li><a href="{{ url_for('musteriler') }}"><i class="fas fa-users"></i> Müşteri Yönetimi</a></li>
+                <li><a href="{{ url_for('talepler') }}"><i class="fas fa-tasks"></i> Talep Yönetimi</a></li>
+                <li><a href="{{ url_for('teklifler') }}"><i class="fas fa-file-invoice-dollar"></i> Teklif Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('siparisler') }}"><i class="fas fa-shopping-cart"></i> Sipariş Yönetimi</a></li>-->
+                <li><a href="{{ url_for('uretim') }}"><i class="fas fa-industry"></i> Üretim Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('raporlar') }}"><i class="fas fa-chart-line"></i> Raporlama</a></li>-->
+            </ul>
+        
+        </ul>
+    <div class="logout">
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+    </div>
+    
+    </div>
+
+    <div class="content">
+        <div class="breadcrumb">
+            <a href="{{ url_for('teklifler') }}">Teklifler</a> &gt; Oluştur
+        </div>
+
+        <div class="form-container">
+            <form id="teklifForm" action="{{ url_for('teklif_kaydet') }}" method="POST">
+                    <input type="hidden" id="musteri" name="musteri"> 
+                <div class="form-group">
+                    <label for="talep_id"><i class="fas fa-barcode"></i> MÜŞTERİ TALEP NUMARASI</label>
+                    <select name="talep_id" id="talep_id" required>
+                        <option value="">Talep Seçiniz</option>
+                        {% for talep in talepler %}
+                            <option value="{{ talep.id }}">{{ talep.musteri_no }} - {{ talep.firma_unvani }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="duzenleme_tarihi"><i class="fas fa-calendar"></i> Düzenleme Tarihi</label>
+                    <input type="date" id="duzenleme_tarihi" name="duzenleme_tarihi" readonly>
+                    <label for="teklif_ismi"><i class="fas fa-hashtag"></i> Teklif Numarası</label>
+                    <input type="text" id="teklif_ismi" name="teklif_ismi" value="{{ teklif_seri }}" readonly>      
+                </div>
+
+                <div class="form-group">
+                    <label for="vade_tarihi"><i class="fas fa-bell"></i> Vade Tarihi</label>
+                    <input type="date" id="vade_tarihi" name="vade_tarihi">
+                </div>
+
+                <div class="form-group">
+                    <label for="doviz"><i class="fas fa-money-bill-wave"></i> Döviz Değiştir</label>
+                    <select id="doviz" name="doviz">
+                        <option value="TL">TL</option>
+                        <option value="$">$</option>
+                        <option value="€">€</option>
+                    </select>
+                </div>
+
+                <table id="teklif-table" class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>HİZMET / ÜRÜN</th>
+                            <th>MİKTAR</th>
+                            <th>BİRİM</th>
+                            <th>BR. FİYAT</th>
+                            <th>VERGİ</th>
+                            <th>TOPLAM</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" name="urun[]" placeholder="Ürün adı" /></td>
+                            <td><input type="text" name="miktar[]" class="miktar" value="1,00" oninput="calculateRowTotal(this)" /></td>
+                            <td>
+                                <select name="birim[]">
+                                    <option value="Adet">Adet</option>
+                                    <option value="Kg">Kg</option>
+                                    <option value="Lt">Lt</option>
+                                </select>
+                            </td>
+                            <td>
+                                <div class="input-currency">
+                                    <input type="text" name="birim_fiyat[]" class="birim-fiyat" value="0,00" oninput="calculateRowTotal(this)" />
+                                    <span class="currency">₺</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="kdv-cell">
+                                    <span class="kdv-label">KDV</span>
+                                    <select name="kdv_oran[]" class="kdv-oran" onchange="calculateRowTotal(this)">
+                                        <option value="0">%0</option>
+                                        <option value="0.10">%10</option>
+                                        <option value="0.20" selected>%20</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-currency">
+                                    <span class="toplam">0,00</span>
+                                    <span class="currency">₺</span>
+                                </div>
+                            </td>
+                            <td>
+                                <button type="button" class="btn-remove-row" onclick="deleteRow(this)">×</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+
+                <div class="button-row">
+                    <button type="button" class="btn-outline" onclick="addRow()">
+                      <i class="fas fa-plus"></i> YENİ SATIR EKLE
+                    </button>
+                  </div>
+                  
+                  <div class="totals-right">
+                    <div class="totals-item">ARA TOPLAM: <span id="ara-toplam">0,00</span> <span class="tl">&#8378;</span></div>
+                    <div class="totals-item">TOPLAM KDV: <span id="toplam-kdv">0,00</span> <span class="tl">&#8378;</span></div>
+                    <div class="totals-item grand">GENEL TOPLAM: <span id="genel-toplam">0,00</span> <span class="tl">&#8378;</span></div>
+                  </div>
+
+                <input type="hidden" name="genel_toplam" id="genel_toplam_input" value="0">
+                <div class="form-actions">
+                    <a href="{{ url_for('teklifler') }}" class="btn-cancel">Vazgeç</a>
+                    <button type="submit" class="btn-save">Teklifi Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="footer">
+            <p>&copy; 2024 MANES Makine Mühendislik - Tüm hakları saklıdır.</p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("duzenleme_tarihi").valueAsDate = new Date();
+        });
+
+        function calculateRowTotal(el) {
+            const row = el.closest("tr");
+            const miktar = parseFloat(row.querySelector(".miktar").value.replace(",", ".")) || 0;
+            const fiyat = parseFloat(row.querySelector(".birim-fiyat").value.replace(",", ".")) || 0;
+            const kdv = parseFloat(row.querySelector(".kdv-oran").value) || 0;
+            const toplam = miktar * fiyat * (1 + kdv);
+            row.querySelector(".toplam").textContent = toplam.toFixed(2).replace(".", ",");
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            let araToplam = 0;
+            let kdvToplam = 0;
+
+            document.querySelectorAll("#teklif-table tbody tr").forEach(row => {
+                const toplam = parseFloat(row.querySelector(".toplam").textContent.replace(",", ".")) || 0;
+                const kdv = parseFloat(row.querySelector(".kdv-oran").value) || 0;
+                araToplam += toplam / (1 + kdv);
+                kdvToplam += toplam - (toplam / (1 + kdv));
+            });
+
+            const genelToplam = araToplam + kdvToplam;
+            document.getElementById("ara-toplam").textContent = araToplam.toFixed(2).replace(".", ",");
+            document.getElementById("toplam-kdv").textContent = kdvToplam.toFixed(2).replace(".", ",");
+            document.getElementById("genel-toplam").textContent = genelToplam.toFixed(2).replace(".", ",");
+            document.getElementById("genel_toplam_input").value = genelToplam.toFixed(2);
+        }
+
+        function addRow() {
+            const table = document.querySelector("#teklif-table tbody");
+            const newRow = table.rows[0].cloneNode(true);
+            newRow.querySelectorAll("input").forEach(input => input.value = "");
+            newRow.querySelector(".toplam").textContent = "0,00";
+            table.appendChild(newRow);
+        }
+
+        function deleteRow(btn) {
+            const row = btn.closest("tr");
+            const table = document.querySelector("#teklif-table tbody");
+            if (table.rows.length > 1) {
+                row.remove();
+                calculateTotals();
+            }
+        }
+
+        document.getElementById("teklifForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const form = this;
+            fetch(form.action, {
+                method: "POST",
+                body: new FormData(form)
+            })
+            .then(res => res.json())
+            .then(data => {
+                Swal.fire({
+                    title: "Başarılı!",
+                    text: data.message,
+                    icon: "success",
+                    confirmButtonText: "Tamam"
+                }).then(() => {
+                    window.location.href = data.redirect;
+                });
+            })
+            .catch(error => {
+                Swal.fire("Hata!", "İşlem sırasında hata oluştu.", "error");
+                console.error(error);
+            });
+        });
+        document.getElementById("talep_id").addEventListener("change", function () {
+    const selectedOption = this.options[this.selectedIndex];
+    const musteriAd = selectedOption.text.split(" - ")[1];  // "MANES2025-01 - MANES MAKİNE"
+    document.getElementById("musteri").value = musteriAd;
+});
+
+    </script>
+</body>
+</html>

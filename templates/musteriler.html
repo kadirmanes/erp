@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Müşteri Yönetimi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <div class="sidebar">
+        <h2><a href="{{ url_for('home') }}" style="text-decoration: none; color: white;">ERP Menüsü</a></h2>
+        <ul>
+            <ul>
+                <li><a href="{{ url_for('musteriler') }}"><i class="fas fa-users"></i> Müşteri Yönetimi</a></li>
+                <li><a href="{{ url_for('talepler') }}"><i class="fas fa-tasks"></i> Talep Yönetimi</a></li>
+                <li><a href="{{ url_for('teklifler') }}"><i class="fas fa-file-invoice-dollar"></i> Teklif Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('siparisler') }}"><i class="fas fa-shopping-cart"></i> Sipariş Yönetimi</a></li>-->
+                <li><a href="{{ url_for('uretim') }}"><i class="fas fa-industry"></i> Üretim Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('raporlar') }}"><i class="fas fa-chart-line"></i> Raporlama</a></li>-->
+            </ul>
+        
+        </ul>
+    <div class="logout">
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+    </div>
+    
+    </div>
+
+    <div class="content">
+        <h2>Müşteri Yönetimi</h2>
+        <div class="search-filter">
+                <button onclick="filterResults()">
+                    <i class="fa-solid fa-filter"></i> FİLTRELE
+                </button>
+                <div class="search-bar">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" placeholder="Ara..." id="searchInput">
+                </div>
+                <button class="new-customer" onclick="window.location.href='/musteri_ekle'">YENİ MÜŞTERİ OLUŞTUR</button>
+
+            </div>
+            
+            <div class="customer-table">
+                {% for musteri in musteriler %}
+                    <a href="{{ url_for('musteri_detay', id=musteri.id) }}" class="customer-item">
+                        <span>{{ musteri.firma_unvani }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+            
+            
+    </div>
+    <div class="footer">
+            <p>&copy; 2024 MANES Makine Mühendislik - Tüm hakları saklıdır.</p>
+        </div>
+    <script>
+    function filterResults() {
+        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const customerItems = document.querySelectorAll('.customer-item');
+    
+        customerItems.forEach(item => {
+            const span = item.querySelector('span');
+            const customerName = span ? span.textContent.toLowerCase() : '';
+        if (customerName.includes(searchInput)) {
+            item.style.display = 'flex'; // Eşleşenleri göster
+        } else {
+            item.style.display = 'none'; // Eşleşmeyenleri gizle
+        }
+    });
+}
+    </script>
+</body>
+
+</html>

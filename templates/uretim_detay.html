@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Üretim Detayı</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><a href="{{ url_for('home') }}" style="text-decoration: none; color: white;">ERP Menüsü</a></h2>
+        <ul>
+            <ul>
+                <li><a href="{{ url_for('musteriler') }}"><i class="fas fa-users"></i> Müşteri Yönetimi</a></li>
+                <li><a href="{{ url_for('talepler') }}"><i class="fas fa-tasks"></i> Talep Yönetimi</a></li>
+                <li><a href="{{ url_for('teklifler') }}"><i class="fas fa-file-invoice-dollar"></i> Teklif Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('siparisler') }}"><i class="fas fa-shopping-cart"></i> Sipariş Yönetimi</a></li>-->
+                <li><a href="{{ url_for('uretim') }}"><i class="fas fa-industry"></i> Üretim Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('raporlar') }}"><i class="fas fa-chart-line"></i> Raporlama</a></li>-->
+            </ul>
+        
+        </ul>
+    <div class="logout">
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+    </div>
+    
+    </div>
+    
+
+<div class="content">
+    <div class="breadcrumb">
+        <a href="{{ url_for('uretim') }}">← İş Emri Listesi</a> / Detay
+    </div>
+
+    <div class="form-group">
+        <label>İş Emri No:</label>
+        <input type="text" value="{{ uretim.is_emri_no }}" readonly>
+    </div>
+    <div class="form-group">
+        <label>Başlangıç Tarihi:</label>
+        <input type="text" value="{{ uretim.baslangic_tarihi or 'Belirtilmemiş' }}" readonly>
+    </div>
+    <div class="form-group">
+        <label>Toplam Planlanan Süre:</label>
+        <input type="text" value="{{ uretim.planlanan_sure_dk }} dakika" readonly>
+    </div>
+
+    <h3 style="margin-top: 40px;">İş Emirleri</h3>
+    <table class="modern-table">
+        <thead>
+        <tr>
+            <th>İş Emri No</th>
+            <th>Resim No</th>
+            <th>Adet</th>
+            <th>Süre (dk)</th>
+            <th>Açıklama</th>
+            <th>Prosesler</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for alt in is_emirleri_rows %}
+        <tr>
+            <td>{{ alt.is_emri_no }}</td>
+            <td>{{ alt.resim_no }}</td>
+            <td>{{ alt.adet }}</td>
+            <td>{{ alt.sure_dk }}</td>
+            <td>{{ alt.aciklama }}</td>
+            <td>
+                {% for proses in alt_prosesler[alt.id] %}
+                    <span>{{ proses }}</span>{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+        <a href="{{ url_for('uretim') }}" class="btn-geri">Geri Dön</a>
+        <a href="{{ url_for('uretim_duzenle', id=uretim.id) }}" class="btn-save">Düzenle</a>
+        <a href="#" class="btn-cancel" onclick="confirmDelete({{ uretim.id }})">Sil</a>
+        <a href="{{ url_for('uretim_pdf', id=uretim.id) }}" class="btn-save" target="_blank">PDF Çıktısı Al</a>
+    </div>
+</div>
+<div class="footer">
+            <p>&copy; 2024 MANES Makine Mühendislik - Tüm hakları saklıdır.</p>
+</div>
+
+<script>
+    function confirmDelete(uretimId) {
+        Swal.fire({
+            title: "Emin misiniz?",
+            text: "Bu iş emrini silmek istediğinize emin misiniz? Bu işlem geri alınamaz!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Evet, sil",
+            cancelButtonText: "Vazgeç"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/uretim_sil/${uretimId}`, {
+                    method: 'GET'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: "Silindi!",
+                            text: data.message,
+                            icon: "success"
+                        }).then(() => {
+                            window.location.href = data.redirect;
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Hata!",
+                            text: data.message,
+                            icon: "error"
+                        });
+                    }
+                })
+                .catch(err => {
+                    Swal.fire({
+                        title: "Hata!",
+                        text: "Silme işlemi sırasında bir hata oluştu.",
+                        icon: "error"
+                    });
+                });
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

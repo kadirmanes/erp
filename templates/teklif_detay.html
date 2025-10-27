@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Teklif Detayı</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+     <div class="sidebar">
+        <h2><a href="{{ url_for('home') }}" style="text-decoration: none; color: white;">ERP Menüsü</a></h2>
+        <ul>
+            <ul>
+                <li><a href="{{ url_for('musteriler') }}"><i class="fas fa-users"></i> Müşteri Yönetimi</a></li>
+                <li><a href="{{ url_for('talepler') }}"><i class="fas fa-tasks"></i> Talep Yönetimi</a></li>
+                <li><a href="{{ url_for('teklifler') }}"><i class="fas fa-file-invoice-dollar"></i> Teklif Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('siparisler') }}"><i class="fas fa-shopping-cart"></i> Sipariş Yönetimi</a></li>-->
+                <li><a href="{{ url_for('uretim') }}"><i class="fas fa-industry"></i> Üretim Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('raporlar') }}"><i class="fas fa-chart-line"></i> Raporlama</a></li>-->
+            </ul>
+        
+        </ul>
+    <div class="logout">
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+    </div>
+    
+    </div>
+
+    <div class="content">
+        <div class="breadcrumb">
+            <a href="{{ url_for('teklifler') }}">← Teklif Listesi</a> / Detay
+        </div>
+
+        
+            <div class="form-group">
+                <label>Müşteri:</label>
+                <input type="text" value="{{ teklif.musteri }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Talep Numarası:</label>
+                <input type="text" value="{{ teklif.manes_numara or '-' }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Düzenleme Tarihi:</label>
+                <input type="text" value="{{ teklif.duzenleme_tarihi }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Vade Tarihi:</label>
+                <input type="text" value="{{ teklif.vade_tarihi or '-' }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Döviz:</label>
+                <input type="text" value="{{ teklif.doviz }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Genel Toplam:</label>
+                <input type="text" value="{{ '%.2f'|format(teklif.genel_toplam|float) }} {{ teklif.doviz }}" readonly>
+            </div>
+
+            <h3 style="margin-top: 40px;">Hizmet / Ürün Detayları</h3>
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Ürün</th>
+                        <th>Miktar</th>
+                        <th>Birim</th>
+                        <th>Birim Fiyat</th>
+                        <th>KDV</th>
+                        <th>Toplam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in detaylar %}
+                    <tr>
+                        <td>{{ d.urun }}</td>
+                        <td>{{ "%.2f"|format(d.miktar) }}</td>
+                        <td>{{ d.birim }}</td>
+                        <td>{{ "%.2f"|format(d.birim_fiyat) }} {{ teklif.doviz }}</td>
+                        <td>{{ "%.0f"|format(d.kdv_oran * 100) }}%</td>
+                        <td>{{ "%.2f"|format(d.toplam) }} {{ teklif.doviz }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                <a href="{{ url_for('teklifler') }}" class="btn-geri">Geri Dön</a>
+                <a href="{{ url_for('teklif_duzenle', id=teklif.id) }}" class="btn-save">Düzenle</a>
+                <a href="{{ url_for('teklif_sil', id=teklif.id) }}" class="btn-cancel" onclick="return confirm('Bu teklifi silmek istediğinizden emin misiniz?');">Sil</a>
+                <a href="{{ url_for('teklif_pdf', id=teklif.id) }}" class="btn-save" target="_blank">PDF Çıktısı Al</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+            <p>&copy; 2024 MANES Makine Mühendislik - Tüm hakları saklıdır.</p>
+    </div>
+</body>
+</html>

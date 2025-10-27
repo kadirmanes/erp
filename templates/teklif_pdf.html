@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ teklif.teklif_ismi }} - PDF</title>
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; margin: 0; padding: 40px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        .logo { height: 80px; }
+        .company-info { text-align: right; font-size: 12px; }
+        h2 { margin-top: 0; }
+        .info-section { margin-bottom: 20px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 8px; text-align: left; }
+        .totals { margin-top: 20px; width: 100%; font-size: 14px; }
+        .totals td { padding: 6px; text-align: right; }
+        .footer { position: fixed; bottom: 30px; left: 40px; right: 40px; font-size: 12px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ logo_path }}" class="logo">
+        <div class="company-info">
+            <strong>Manes Makina Mühendislik Ltd. Şti.</strong><br>
+            İvedik OSB Mah. 1474. Cad. No:37 Yenimahalle / ANKARA<br>
+            Tel: 0507 773 6860<br>
+            Vergi Dairesi: İvedik<br>
+            Vergi No: 6121732260
+        </div>
+    </div>
+
+    <h2>TEKLİF FORMU</h2>
+
+    <div class="info-section">
+        <strong>Teklif No:</strong> {{ teklif.teklif_ismi }}<br>
+        <strong>Müşteri:</strong> {{ teklif.musteri }}<br>
+        <strong>Talep No:</strong> {{ teklif.manes_numara or '-' }}<br>
+        <strong>Düzenleme Tarihi:</strong> {{ teklif.duzenleme_tarihi }}<br>
+        <strong>Vade Tarihi:</strong> {{ teklif.vade_tarihi or '-' }}<br>
+        <strong>Döviz:</strong> {{ teklif.doviz }}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Ürün / Hizmet</th>
+                <th>Miktar</th>
+                <th>Birim</th>
+                <th>Birim Fiyat</th>
+                <th>KDV</th>
+                <th>Toplam</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in detaylar %}
+            <tr>
+                <td>{{ d.urun }}</td>
+                <td>{{ "%.2f"|format(d.miktar) }}</td>
+                <td>{{ d.birim }}</td>
+                <td>{{ "%.2f"|format(d.birim_fiyat) }} {{ teklif.doviz }}</td>
+                <td>{{ "%.0f"|format(d.kdv_oran * 100) }}%</td>
+                <td>{{ "%.2f"|format(d.toplam) }} {{ teklif.doviz }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="totals">
+        <tr>
+            <td><strong>Genel Toplam:</strong> {{ "%.2f"|format(teklif.genel_toplam|float) }} {{ teklif.doviz }}</td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        Bu teklif {{ teklif.duzenleme_tarihi }} tarihinde hazırlanmıştır.
+    </div>
+</body>
+</html>

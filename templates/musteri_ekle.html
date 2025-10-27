@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni Müşteri Ekle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><a href="{{ url_for('home') }}" style="text-decoration: none; color: white;">ERP Menüsü</a></h2>
+        <ul>
+            <ul>
+                <li><a href="{{ url_for('musteriler') }}"><i class="fas fa-users"></i> Müşteri Yönetimi</a></li>
+                <li><a href="{{ url_for('talepler') }}"><i class="fas fa-tasks"></i> Talep Yönetimi</a></li>
+                <li><a href="{{ url_for('teklifler') }}"><i class="fas fa-file-invoice-dollar"></i> Teklif Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('siparisler') }}"><i class="fas fa-shopping-cart"></i> Sipariş Yönetimi</a></li>-->
+                <li><a href="{{ url_for('uretim') }}"><i class="fas fa-industry"></i> Üretim Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('raporlar') }}"><i class="fas fa-chart-line"></i> Raporlama</a></li>-->
+            </ul>
+        
+        </ul>
+    <div class="logout">
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+    </div>
+    
+    </div>
+    
+    <div class="content">
+            <div class="breadcrumb">
+                <a href="/musteriler" class="breadcrumb-link">Müşteriler</a> &gt; <span>Yeni</span>
+            </div>
+            <div class="form-container">
+            
+                <div class="form-header">
+                    <h2>Yeni Müşteri Ekle</h2>
+                    <form action="/musteri_ekle" method="POST" id="musteriForm">
+                    
+                    <div class="form-actions">
+                            <a href="{{ url_for('musteriler') }}" class="btn-cancel">Vazgeç</a>
+                            <button type="submit" class="btn-save">Kaydet</button>
+                               
+                        </div>
+                </div>
+                    <div class="form-group">
+                        <label for="firma_unvani">
+                            <i class="fa-solid fa-building"></i> FİRMA UNVANI
+                        </label>
+                        <input type="text" id="firma_unvani" name="firma_unvani" placeholder="Firma Unvanı" required maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fa-solid fa-envelope"></i> E-POSTA ADRESİ
+                        </label>
+                        <input type="email" id="email" name="email" placeholder="E-Posta Adresi" required maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="telefon">
+                            <i class="fa-solid fa-phone"></i> TELEFON
+                        </label>
+                        <input type="text" id="telefon" name="telefon" placeholder="0555 555 55 55" required maxlength="14" oninput="telefonFormatla(this)">
+                    </div>
+                    <div class="form-group">
+                        <label for="vkn_tckn">
+                            <i class="fa-solid fa-id-card"></i> VKN / TCKN
+                        </label>
+                        <input type="text" id="vkn_tckn" name="vkn_tckn" placeholder="VKN / TCKN" required oninput="sadeceSayi(this)" maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="vergi_dairesi">
+                            <i class="fa-solid fa-file-invoice"></i> VERGİ DAİRESİ
+                        </label>
+                        <input type="text" id="vergi_dairesi" name="vergi_dairesi" placeholder="Vergi Dairesi" required maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="adres">
+                            <i class="fa-solid fa-map-marker-alt"></i> ADRES
+                        </label>
+                        <textarea id="adres" name="adres" placeholder="Adres bilgisini giriniz"></textarea>
+                    </div>
+                
+            </form>
+        </div>
+        
+    </div>
+    <div class="footer">
+            <p>&copy; 2024 MANES Makine Mühendislik - Tüm hakları saklıdır.</p>
+        </div>
+    
+        <script>
+            function telefonFormatla(input) {
+                let telefon = input.value.replace(/\D/g, '');
+                if (telefon.length > 4 && telefon.length <= 7) {
+                    telefon = telefon.slice(0, 4) + ' ' + telefon.slice(4);
+                } else if (telefon.length > 7 && telefon.length <= 9) {
+                    telefon = telefon.slice(0, 4) + ' ' + telefon.slice(4, 7) + ' ' + telefon.slice(7);
+                } else if (telefon.length > 9) {
+                    telefon = telefon.slice(0, 4) + ' ' + telefon.slice(4, 7) + ' ' + telefon.slice(7, 9) + ' ' + telefon.slice(9, 14);
+                }
+                input.value = telefon;
+            }
+    
+            function sadeceSayi(input) {
+                input.value = input.value.replace(/\D/g, ''); 
+            }
+        </script>
+        <script>
+            
+            document.getElementById("musteriForm").addEventListener("submit", function(event) {
+                event.preventDefault(); // Sayfanın yenilenmesini engelle
+    
+                fetch(this.action, {
+                    method: "POST",
+                    body: new FormData(this)
+                })
+                .then(response => response.json()) // JSON yanıtı al
+                .then(data => {
+                    if (data.error) {
+                        Swal.fire({
+                            title: "Hata!",
+                            text: data.error,
+                            icon: "error",
+                            confirmButtonText: "Tamam",
+                            allowOutsideClick: false, // Kullanıcının dışarı tıklamasıyla kapanmasını engelle
+                            allowEscapeKey: false // Kullanıcının ESC tuşuyla kapatmasını engelle
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Başarılı!",
+                            text: data.message,
+                            icon: "success",
+                            confirmButtonText: "Tamam",
+                            allowOutsideClick: false, // Kullanıcının dışarı tıklamasıyla kapanmasını engelle
+                            allowEscapeKey: false // Kullanıcının ESC tuşuyla kapatmasını engelle
+                        }).then(() => {
+                            window.location.href = data.redirect; // Başarılıysa yönlendirme yap
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: "Hata!",
+                        text: "Bir hata oluştu: " + error.message,
+                        icon: "error",
+                        confirmButtonText: "Tamam"
+                    });
+                });
+            });
+    
+        </script>
+</body>
+</html>

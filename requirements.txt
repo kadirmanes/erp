@@ -1,0 +1,6 @@
+﻿flask
+mysql-connector-python
+pdfkit
+weasyprint
+qrcode
+python-dotenv

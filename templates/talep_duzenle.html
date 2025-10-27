@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talep Bilgisini Düzenle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><a href="{{ url_for('home') }}" style="text-decoration: none; color: white;">ERP Menüsü</a></h2>
+        <ul>
+            <ul>
+                <li><a href="{{ url_for('musteriler') }}"><i class="fas fa-users"></i> Müşteri Yönetimi</a></li>
+                <li><a href="{{ url_for('talepler') }}"><i class="fas fa-tasks"></i> Talep Yönetimi</a></li>
+                <li><a href="{{ url_for('teklifler') }}"><i class="fas fa-file-invoice-dollar"></i> Teklif Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('siparisler') }}"><i class="fas fa-shopping-cart"></i> Sipariş Yönetimi</a></li>-->
+                <li><a href="{{ url_for('uretim') }}"><i class="fas fa-industry"></i> Üretim Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('raporlar') }}"><i class="fas fa-chart-line"></i> Raporlama</a></li>-->
+            </ul>
+        
+        </ul>
+    <div class="logout">
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+    </div>
+    
+    </div>
+
+    <div class="content">
+        <div class="breadcrumb">
+            <a href="{{ url_for('talepler') }}" class="breadcrumb-link">Talepler</a> &gt; <span>Düzenle</span>
+        </div>
+
+        <div class="form-container">
+            <form id="talepForm" action="{{ url_for('talep_duzenle', id=talep.id) }}" method="POST">
+                <h2>Talep Bilgisini Düzenle</h2>
+
+                <div class="form-group">
+                    <label for="musteri_no">
+                        <i class="fa-solid fa-barcode"></i> MÜŞTERİ TALEP NUMARASI
+                    </label>
+                    <input type="text" id="musteri_no" name="musteri_no" value="{{ talep.musteri_no }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="musteri_id">
+                        <i class="fa-solid fa-user"></i> MÜŞTERİ
+                    </label>
+                    <select id="musteri_id" name="musteri_id" required>
+                        <option value="">Müşteri seçiniz</option>
+                        {% for musteri in musteriler %}
+                            <option value="{{ musteri[0] }}" {% if musteri[0] == talep.musteri_id %}selected{% endif %}>
+                                {{ musteri[1] }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="manes_numara">
+                        <i class="fa-solid fa-hashtag"></i> MANES TALEP NUMARASI
+                    </label>
+                    <input type="text" id="manes_numara" name="manes_numara" value="{{ talep.manes_numara }}" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="tarih"><i class="fa-solid fa-calendar"></i> TARİH</label>
+                    <input type="date" id="tarih" name="tarih" value="{{ talep.tarih }}" required>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('talepler') }}" class="btn-cancel">Vazgeç</a>
+                    <button type="submit" class="btn-save">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 MANES Makine Mühendislik - Tüm hakları saklıdır.</p>
+    </div>
+
+    <script>
+        document.getElementById("talepForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Sayfa yenilenmesini engelle
+    
+            fetch(this.action, {
+                method: "POST",
+                body: new FormData(this)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    Swal.fire({
+                        title: "Hata!",
+                        text: data.error,
+                        icon: "error",
+                        confirmButtonText: "Tamam",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Başarılı!",
+                        text: data.message,
+                        icon: "success",
+                        confirmButtonText: "Tamam",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then(() => {
+                        window.location.href = data.redirect;
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: "Hata!",
+                    text: "Bir hata oluştu: " + error.message,
+                    icon: "error",
+                    confirmButtonText: "Tamam"
+                });
+            });
+        });
+    </script>
+    
+</body>
+</html>

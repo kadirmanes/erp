@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>İş Emri Düzenle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><a href="{{ url_for('home') }}" style="text-decoration: none; color: white;">ERP Menüsü</a></h2>
+        <ul>
+            <ul>
+                <li><a href="{{ url_for('musteriler') }}"><i class="fas fa-users"></i> Müşteri Yönetimi</a></li>
+                <li><a href="{{ url_for('talepler') }}"><i class="fas fa-tasks"></i> Talep Yönetimi</a></li>
+                <li><a href="{{ url_for('teklifler') }}"><i class="fas fa-file-invoice-dollar"></i> Teklif Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('siparisler') }}"><i class="fas fa-shopping-cart"></i> Sipariş Yönetimi</a></li>-->
+                <li><a href="{{ url_for('uretim') }}"><i class="fas fa-industry"></i> Üretim Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('raporlar') }}"><i class="fas fa-chart-line"></i> Raporlama</a></li>-->
+            </ul>
+        
+        </ul>
+    <div class="logout">
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+    </div>
+    
+    </div>
+
+<div class="content">
+    <div class="breadcrumb">
+        <a href="{{ url_for('uretim') }}">&larr; İş Emri Listesi</a> / Düzenle
+    </div>
+
+    <form id="uretimForm" action="{{ url_for('uretim_duzenle', id=uretim.id) }}" method="POST">
+        <div class="form-group">
+            <label>İş Emri No:</label>
+            <input type="text" name="is_emri_no" value="{{ uretim.is_emri_no }}" readonly>
+        </div>
+        <div class="form-group">
+            <label>Toplam Planlanan Süre (dk):</label>
+            <input type="text" name="planlanan_sure_dk" value="{{ uretim.planlanan_sure_dk }}" readonly>
+        </div>
+
+        <h3 style="margin-top: 40px;">Alt İş Emirleri</h3>
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Alt İş Emri No</th>
+                    <th>Resim No</th>
+                    <th>Adet</th>
+                    <th>Tahmini Süre (saat)</th>
+                    <th>Açıklama</th>
+                    <th>Prosesler</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody id="isEmriTableBody">
+                {% for alt in is_emirleri_rows %}
+                <tr>
+                    <td><input type="text" name="alt_is_emri_no[]" value="{{ alt.is_emri_no }}" readonly></td>
+                    <td><input type="text" name="alt_resim_no[]" value="{{ alt.resim_no }}" required></td>
+                    <td><input type="number" name="alt_adet[]" value="{{ alt.adet }}" min="1" required></td>
+                    <td><input type="number" name="alt_tahmini_sure[]" value="{{ (alt.sure_dk / alt.adet / 60) if alt.adet else 0 }}" step="0.1" min="0" required></td>
+                    <td><input type="text" name="alt_aciklama[]" value="{{ alt.aciklama }}"></td>
+                    <td>
+                        <div class="prosesler-grid">
+                            {% set prosesler = alt_prosesler[alt.id] %}
+                            {% for proses in ['İmalat', 'Kaynak', 'Taşlama', 'Temizlik', 'Klavuz', 'Kesim', 'Büküm', 'Boya', 'Kaplama'] %}
+                            <label>
+                                <input type="checkbox" name="proses_{{ loop.index0 }}[]" value="{{ proses }}" {% if proses in prosesler %}checked{% endif %}>
+                                {{ proses }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn-danger" onclick="removeRow(this)"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="button-row">
+            <button type="button" class="btn-outline" onclick="addAltIsEmriRow()"><i class="fas fa-plus"></i> İş Emri Ekle</button>
+        </div>
+
+        <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+            <a href="{{ url_for('uretim') }}" class="btn-cancel">Geri Dön</a>
+            <button type="submit" class="btn-save">Güncelle</button>
+        </div>
+    </form>
+</div>
+<div class="footer">
+            <p>&copy; 2024 MANES Makine Mühendislik - Tüm hakları saklıdır.</p>
+    </div>
+
+<script>
+let altIndex = {{ is_emirleri_rows|length }};
+const prosesler = ['İmalat', 'Kaynak', 'Taşlama', 'Temizlik', 'Klavuz', 'Kesim', 'Büküm', 'Boya', 'Kaplama'];
+
+function addAltIsEmriRow() {
+    const tbody = document.getElementById("isEmriTableBody");
+    const tr = document.createElement("tr");
+    const anaIsEmriNo = document.querySelector('[name="is_emri_no"]').value;
+    const yeniIsEmriNo = `${anaIsEmriNo}-${altIndex}`;
+
+    const prosesCheckboxHTML = prosesler.map((p, i) => `
+        <label>
+            <input type="checkbox" name="proses_${altIndex}[]" value="${p}"> ${p}
+        </label>
+    `).join('');
+
+    tr.innerHTML = `
+        <td><input type="text" name="alt_is_emri_no[]" value="${yeniIsEmriNo}" readonly></td>
+        <td><input type="text" name="alt_resim_no[]" required></td>
+        <td><input type="number" name="alt_adet[]" value="1" min="1" required></td>
+        <td><input type="number" name="alt_tahmini_sure[]" value="0" step="0.1" min="0" required></td>
+        <td><input type="text" name="alt_aciklama[]"></td>
+        <td><div class="prosesler-grid">${prosesCheckboxHTML}</div></td>
+        <td><button type="button" class="btn-danger" onclick="removeRow(this)"><i class="fas fa-trash"></i></button></td>
+    `;
+
+    tbody.appendChild(tr);
+    altIndex++;
+}
+
+function removeRow(button) {
+    const row = button.closest('tr');
+    if (confirm('Bu satırı silmek istediğinize emin misiniz?')) {
+        row.remove();
+        // Toplam süreyi yeniden hesapla
+        calculateTotalTime();
+    }
+}
+
+function calculateTotalTime() {
+    let totalMinutes = 0;
+    const rows = document.querySelectorAll('#isEmriTableBody tr');
+    
+    rows.forEach(row => {
+        const adet = parseFloat(row.querySelector('[name="alt_adet[]"]').value) || 0;
+        const sure = parseFloat(row.querySelector('[name="alt_tahmini_sure[]"]').value) || 0;
+        totalMinutes += adet * sure * 60; // Saati dakikaya çevir
+    });
+    
+    document.querySelector('[name="planlanan_sure_dk"]').value = Math.round(totalMinutes);
+}
+
+// Form gönderimini AJAX ile yap
+document.getElementById('uretimForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Önce toplam süreyi hesapla
+    calculateTotalTime();
+    
+    const formData = new FormData(this);
+    
+    fetch(this.action, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            Swal.fire('Hata!', data.error, 'error');
+        } else {
+            Swal.fire('Başarılı!', data.message, 'success').then(() => {
+                window.location.href = data.redirect || "{{ url_for('uretim') }}";
+            });
+        }
+    })
+    .catch(error => {
+        Swal.fire('Hata!', 'Bir hata oluştu: ' + error.message, 'error');
+    });
+});
+
+// Input değişikliklerinde toplam süreyi hesapla
+document.addEventListener('input', function(e) {
+    if (e.target.matches('[name="alt_adet[]"], [name="alt_tahmini_sure[]"]')) {
+        calculateTotalTime();
+    }
+});
+
+// Sayfa yüklendiğinde toplam süreyi hesapla
+document.addEventListener('DOMContentLoaded', calculateTotalTime);
+</script>
+</body>
+</html>

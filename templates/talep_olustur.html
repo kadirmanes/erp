@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni Talep Oluştur</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+        <div class="sidebar">
+        <h2><a href="{{ url_for('home') }}" style="text-decoration: none; color: white;">ERP Menüsü</a></h2>
+        <ul>
+            <ul>
+                <li><a href="{{ url_for('musteriler') }}"><i class="fas fa-users"></i> Müşteri Yönetimi</a></li>
+                <li><a href="{{ url_for('talepler') }}"><i class="fas fa-tasks"></i> Talep Yönetimi</a></li>
+                <li><a href="{{ url_for('teklifler') }}"><i class="fas fa-file-invoice-dollar"></i> Teklif Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('siparisler') }}"><i class="fas fa-shopping-cart"></i> Sipariş Yönetimi</a></li>-->
+                <li><a href="{{ url_for('uretim') }}"><i class="fas fa-industry"></i> Üretim Yönetimi</a></li>
+                <!-- <li><a href="{{ url_for('raporlar') }}"><i class="fas fa-chart-line"></i> Raporlama</a></li>-->
+            </ul>
+        
+        </ul>
+    <div class="logout">
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+    </div>
+    
+    </div>
+
+    <!-- Ana İçerik -->
+    <div class="content">
+        <!-- Sayfa yolu -->
+        <div class="breadcrumb">
+            <a href="/talepler">Talepler</a> &gt; <span>Yeni</span>
+        </div>
+
+        <!-- Form Alanı -->
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Yeni Talep Oluştur</h2>
+                <form action="/talep_olustur" method="POST">
+                    
+                    <!-- Butonlar -->
+                    <div class="form-actions">
+                        <a href="{{ url_for('talepler') }}" class="btn-cancel">Vazgeç</a>
+                        <button type="submit" class="btn-save">Kaydet</button>
+                    </div>
+
+                    <!-- Müşteri Talep Numarası -->
+                    <div class="form-group">
+                        <label for="musteri_no">
+                            MÜŞTERİ TALEP NUMARASI
+                        </label>
+                        <input type="text" id="musteri_no" name="musteri_no" placeholder="Müşteri talep numarası giriniz" required>
+                    </div>
+
+                    <!-- Müşteri Seçimi -->
+                    <div class="form-group">
+                        <label for="musteri_id">MÜŞTERİ</label>
+                        <select id="musteri_id" name="musteri_id" required>
+                            <option value="">Müşteri seçiniz</option>
+                            {% for musteri in musteriler %}
+                            <option value="{{ musteri['id'] }}">{{ musteri['firma_unvani'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 MANES Makine Mühendislik - Tüm hakları saklıdır.</p>
+    </div>
+</body>
+<script>
+    document.querySelector("form").addEventListener("submit", function(event) {
+        event.preventDefault(); // Sayfanın reload olmasını engeller
+
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                Swal.fire({
+                    title: "Hata!",
+                    text: data.error,
+                    icon: "error",
+                    confirmButtonText: "Tamam"
+                });
+            } else {
+                Swal.fire({
+                    title: "Başarılı!",
+                    text: data.message,
+                    icon: "success",
+                    confirmButtonText: "Tamam"
+                }).then(() => {
+                    window.location.href = data.redirect;
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                title: "Hata!",
+                text: "Bir hata oluştu: " + error.message,
+                icon: "error",
+                confirmButtonText: "Tamam"
+            });
+        });
+    });
+</script>
+</html>
